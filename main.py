@@ -1,41 +1,43 @@
 import os
 from dotenv import load_dotenv
-from simpleaichat import AIChat
+from simpleaichat import AsyncAIChat
+import asyncio
+from google_tools import google_search, google_custom_search
 
 # Load .env file
 load_dotenv()
 
 # Get OpenAI API key from .env file
 api_key = os.getenv('OPENAI_API_KEY')
-#print(f"API Key: {api_key}")  # Print the API key
 if not api_key:
     raise ValueError("OPENAI_API_KEY not found in .env file")
 
-# Custom system message
-system = "You are chatting with an AI assistant that can provide helpful information and answer questions to the best of its ability."
-print(f"System Message: {system}")  # Print the system message
+# Create AsyncAIChat instance with OpenAI API key and tools
+ai = AsyncAIChat(api_key=api_key, model='gpt-3.5-turbo-16k', console=False, tools=[google_search, google_custom_search])
 
-try:
-    # Create AIChat instance with OpenAI API key, model, and custom system message
-    model = 'gpt-3.5-turbo'
-    print(f"Model: {model}")  # Print the model name
-    chat = AIChat(api_key, model=model, system=system)
-except Exception as e:
-    print(f"Error: Unable to create AIChat instance. Please check your inputs. Error: {str(e)}")
-    exit(1)
+# Async function to generate response from AI model
+async def generate_response(prompt):
+    response = await ai(prompt)
+    return response
 
-# Chat loop
-while True:
-    user_input = input('User: ')
+# Async function to run chat loop
+async def run_chat():
+    # Ask user for the first query
+    user_input = input('You: ')
     if user_input.lower() == 'quit':
-        break
-    try:
-        response = chat.generate_response(user_input)
-    except Exception:
-        print("Error: Unable to generate response. Please check your input.")
-        continue
+        return
+
+    # Get response from AI model for the first query
+    response = await generate_response(user_input)
     print(f'AI: {response}')
 
+    # Chat loop
+    while True:
+        user_input = input('You: ')
+        if user_input.lower() == 'quit':
+            break
+        response = await generate_response(user_input)
+        print(f'AI: {response}')
 
-
-
+# Run chat loop
+asyncio.run(run_chat())
