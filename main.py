@@ -7,7 +7,7 @@ load_dotenv()
 
 # Get OpenAI API key from .env file
 api_key = os.getenv('OPENAI_API_KEY')
-print(f"API Key: {api_key}")  # Print the API key
+#print(f"API Key: {api_key}")  # Print the API key
 if not api_key:
     raise ValueError("OPENAI_API_KEY not found in .env file")
 
@@ -20,11 +20,8 @@ try:
     model = 'gpt-3.5-turbo'
     print(f"Model: {model}")  # Print the model name
     chat = AIChat(api_key, model=model, system=system)
-except IndexError as e:
-    print(f"Error: Unable to create AIChat instance. Please check your inputs. Error: {str(e)}")
-    exit(1)
 except Exception as e:
-    print(f"Unexpected error: {str(e)}")
+    print(f"Error: Unable to create AIChat instance. Please check your inputs. Error: {str(e)}")
     exit(1)
 
 # Chat loop
@@ -38,6 +35,7 @@ while True:
         print("Error: Unable to generate response. Please check your input.")
         continue
     print(f'AI: {response}')
+
 
 
 
