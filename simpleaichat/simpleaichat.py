@@ -85,6 +85,9 @@ class AIChat(BaseModel):
         except IndexError as e:
             print(f"Error creating new session: {str(e)}")
             raise
+        except IndexError as e:
+            print(f"Error creating new session: {str(e)}")
+            raise
 
     def get_session(self, id: Union[str, UUID] = None) -> ChatSession:
         try:
