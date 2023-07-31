@@ -64,23 +64,27 @@ class AIChat(BaseModel):
         **kwargs,
     ) -> Optional[ChatGPTSession]:
 
-        if "model" not in kwargs:  # set default
-            kwargs["model"] = "gpt-3.5-turbo"
-        # TODO: Add support for more models (PaLM, Claude)
-        if "gpt-" in kwargs["model"]:
-            gpt_api_key = kwargs.get("api_key") or os.getenv("OPENAI_API_KEY")
-            assert gpt_api_key, f"An API key for {kwargs['model'] } was not defined."
-            sess = ChatGPTSession(
-                auth={
-                    "api_key": gpt_api_key,
-                },
-                **kwargs,
-            )
+        try:
+            if "model" not in kwargs:  # set default
+                kwargs["model"] = "gpt-3.5-turbo"
+            # TODO: Add support for more models (PaLM, Claude)
+            if "gpt-" in kwargs["model"]:
+                gpt_api_key = kwargs.get("api_key") or os.getenv("OPENAI_API_KEY")
+                assert gpt_api_key, f"An API key for {kwargs['model'] } was not defined."
+                sess = ChatGPTSession(
+                    auth={
+                        "api_key": gpt_api_key,
+                    },
+                    **kwargs,
+                )
 
-        if return_session:
-            return sess
-        else:
-            self.sessions[sess.id] = sess
+            if return_session:
+                return sess
+            else:
+                self.sessions[sess.id] = sess
+        except IndexError as e:
+            print(f"Error creating new session: {str(e)}")
+            raise
 
     def get_session(self, id: Union[str, UUID] = None) -> ChatSession:
         try:
